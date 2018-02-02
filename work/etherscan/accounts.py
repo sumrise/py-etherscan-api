@@ -21,7 +21,7 @@ class Account(Client):
         req = self.connect()
         return req['result']
 
-    def get_transaction_page(self, page=1, offset=10000, sort='asc', internal=False) -> list:
+    def get_transaction_page(self, page=1, offset=10000, sort='asc', internal=False):
         """
         Get a page of transactions, each transaction returns list of dict with keys:
             nonce
@@ -62,7 +62,7 @@ class Account(Client):
         req = self.connect()
         return req['result']
 
-    def get_all_transactions(self, offset=10000, sort='asc', internal=False) -> list:
+    def get_all_transactions(self, offset=10000, sort='asc', internal=False):
         if internal:
             self.url_dict[self.ACTION] = 'txlistinternal'
         else:
@@ -87,7 +87,7 @@ class Account(Client):
                 print("page {} added".format(page_number[0]))
                 self.url_dict[self.PAGE] = str(int(page_number[0]) + 1)
 
-    def get_blocks_mined_page(self, blocktype='blocks', page=1, offset=10000) -> list:
+    def get_blocks_mined_page(self, blocktype='blocks', page=1, offset=10000):
         """
         Get a page of blocks mined by given address, returns list of dict with keys:
             blockReward (in wei)
@@ -106,7 +106,7 @@ class Account(Client):
         req = self.connect()
         return req['result']
 
-    def get_all_blocks_mined(self, blocktype='blocks', offset=10000) -> list:
+    def get_all_blocks_mined(self, blocktype='blocks', offset=10000):
         self.url_dict[self.ACTION] = 'getminedblocks'
         self.url_dict[self.BLOCK_TYPE] = blocktype
         self.url_dict[self.PAGE] = str(1)

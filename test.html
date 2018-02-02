@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<header>
+    <meta charset="utf-8">
+    <!-- 引入 ECharts 文件 -->
+    <script src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+    <script src="http://libs.baidu.com/jquery/2.1.1/jquery.min.js"></script>
+</header>
+<body>
+<!-- 为 ECharts 准备一个具备大小（宽高）的Dom -->
+<div id="main" style="width: 1000px;height:800px;"></div>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    // 指定图表的配置项和数据
+    option = {
+        title: {
+            text: 'Graph 简单示例'
+        },
+        tooltip: {},
+        animationDurationUpdate: 1500,
+        animationEasingUpdate: 'quinticInOut',
+        series : [
+            {
+                type: 'graph',
+                layout: 'force',
+                symbolSize: 50,
+                roam: true,
+                label: {
+                    normal: {
+                        show: true
+                    }
+                },
+                symbol:'circle',
+                force:{repulsion: 2000},
+                categories : [
+                    {
+                        name: '人物'
+                    },
+                    {
+                        name: '家人'
+                    },
+                    {
+                        name:'朋友'
+                    }
+                ],
+                nodes:[
+
+                ],
+                links : [
+
+                ],
+                draggable:true,
+                edgeLabel: {
+                    normal: {
+                        textStyle: {
+                            fontSize: 20
+                        }
+                    }
+                },
+
+
+            }
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+
+
+    $.ajax({
+        url:'echartsDisplay',
+        type:'POST',
+        data:"{}",
+        dataType:'json',
+        success:function (data) {
+
+
+                option.series[0].nodes=data.echartsData.nodes;
+                option.series[0].links=data.echartsData.links;
+                myChart.setOption(option);
+
+
+        },
+        error: function (errorMsg) {
+
+            alert("不好意思，大爷，图表请求数据失败啦!");
+
+    }
+    });
+</script>
+
+
+</body>
+</html>

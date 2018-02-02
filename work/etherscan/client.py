@@ -90,7 +90,7 @@ class Client(object):
                     return req.json()
                 else:
                     print(req.json()['message'])
-                    exit()
+                    return req.json()
             else:
                 print("Invalid Request")
                 exit()
