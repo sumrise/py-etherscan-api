@@ -1,8 +1,23 @@
-# py-etherscan-api module
+# eth资金流向查看   api from py-etherscan-api module
+
+
+
+以太坊地址 账本追踪
+1.给定一个或多个节点开始爬， 可能需要爬当前页， 还要下载csv分析（直接通过api来下载数据）， 爬过的tx交易都打上标记，存入数据库中
+2.爬完后会把数据存到本地
+3.出入越大的节点，自身图片越大，代表大户
+
+4.可以给自己想要查的一笔资金或者一笔交易tx，打上标记，在图示上标一个颜色，展示流向
+5.图片可以参考天眼里分析公司的那个
+
+
+
+
+
 EtherScan.io API python bindings
 
 ## Description
-This module is written as an effort to provide python bindings to the EtherScan.io API, which can be found at: 
+This module is written as an effort to provide python bindings to the EtherScan.io API, which can be found at:
 https://etherscan.io/apis
 In order to use this, you must attain an Etherscan user account, and generate an API key.
 
@@ -11,7 +26,7 @@ If you'd like to use the provided examples without altering them, then the JSON 
 the base directory.  Its format is as follows:
 
     { "key" : "YourApiKeyToken" }
-    
+
 with `YourApiKeyToken` is your provided API key token from EtherScan.io
 
 ## Installation

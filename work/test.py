@@ -16,7 +16,7 @@ with open('../api_key.json', mode='r') as key_file:
 address = '0x006922CF75094708c691d06818034d89aeB23ca0'
 
 api = Account(address=address, api_key=key)
-transactions = api.get_all_transactions(offset=100, sort='desc', internal=False)
+transactions = api.get_all_transactions(sort='desc', internal=False)
 
-
+print(len(transactions))
 print(transactions)
