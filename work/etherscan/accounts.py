@@ -1,5 +1,9 @@
 from .client import Client
 import re
+import logging
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 class Account(Client):
@@ -62,7 +66,7 @@ class Account(Client):
         req = self.connect()
         return req['result']
 
-    def get_all_transactions(self, offset=10000, sort='asc', internal=False):
+    def get_all_transactions(self, offset=10000, sort='desc', internal=False, start_block=0):
         if internal:
             self.url_dict[self.ACTION] = 'txlistinternal'
         else:
@@ -70,11 +74,13 @@ class Account(Client):
         self.url_dict[self.PAGE] = str(1)
         self.url_dict[self.OFFSET] = str(offset)
         self.url_dict[self.SORT] = sort
+        self.url_dict[self.START_BLOCK] = str(start_block)
         self.build_url()
 
         trans_list = []
         while True:
             self.build_url()
+            logging.debug(self.url)
             req = self.connect()
             if "No transactions found" in req['message']:
                 print("Total number of transactions: {}".format(len(trans_list)))
@@ -83,7 +89,8 @@ class Account(Client):
             else:
                 trans_list += req['result']
                 # Find any character block that is a integer of any length
-                page_number = re.findall(r'[1-9](?:\d{0,2})(?:,\d{3})*(?:\.\d*[1-9])?|0?\.\d*[1-9]|0', self.url_dict[self.PAGE])
+                page_number = re.findall(r'[1-9](?:\d{0,2})(?:,\d{3})*(?:\.\d*[1-9])?|0?\.\d*[1-9]|0',
+                                         self.url_dict[self.PAGE])
                 print("page {} added".format(page_number[0]))
                 self.url_dict[self.PAGE] = str(int(page_number[0]) + 1)
 
@@ -122,7 +129,8 @@ class Account(Client):
             else:
                 blocks_list += req['result']
                 # Find any character block that is a integer of any length
-                page_number = re.findall(r'[1-9](?:\d{0,2})(?:,\d{3})*(?:\.\d*[1-9])?|0?\.\d*[1-9]|0', self.url_dict[self.PAGE])
+                page_number = re.findall(r'[1-9](?:\d{0,2})(?:,\d{3})*(?:\.\d*[1-9])?|0?\.\d*[1-9]|0',
+                                         self.url_dict[self.PAGE])
                 print("page {} added".format(page_number[0]))
                 self.url_dict[self.PAGE] = str(int(page_number[0]) + 1)
 

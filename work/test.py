@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 2018/2/1 下午6:26
-# @Author  : guowei
+# @Author  : sumrise
 # @Site    : 
 # @File    : test.py
 # @Software: PyCharm
