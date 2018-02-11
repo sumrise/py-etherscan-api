@@ -28,6 +28,13 @@ class Record(MySQLModel):
     to = pw.CharField()
     value = pw.DoubleField()
 
+    def as_json(self):
+        return dict(
+            address=self.account, value=self.value)
+
+    def as_list_json(self):
+        return dict(address=self.account, value=self.value)
+
     class Meta:
         db_table = 'record'
 
@@ -50,7 +57,8 @@ class Address(MySQLModel):
 
 class Node:
 
-    def __init__(self, address, name, blockNumber, timeStamp, value, level):
+    def __init__(self, hash, address, name, blockNumber, timeStamp, value, level):
+        self.hash = hash
         self.address = address
         self.name = name
         self.blockNumber = blockNumber
@@ -61,7 +69,7 @@ class Node:
 
     def as_json(self):
         return dict(
-            address=self.address, name=self.name, value=self.value, level=self.level,
+            hash=self.hash, address=self.address, name=self.name, value=self.value, level=self.level,
             children=[ob.as_json() for ob in self.children])
 
 

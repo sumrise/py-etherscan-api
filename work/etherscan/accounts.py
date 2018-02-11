@@ -91,7 +91,7 @@ class Account(Client):
                 # Find any character block that is a integer of any length
                 page_number = re.findall(r'[1-9](?:\d{0,2})(?:,\d{3})*(?:\.\d*[1-9])?|0?\.\d*[1-9]|0',
                                          self.url_dict[self.PAGE])
-                print("page {} added".format(page_number[0]))
+                # print("page {} added".format(page_number[0]))
                 self.url_dict[self.PAGE] = str(int(page_number[0]) + 1)
 
     def get_blocks_mined_page(self, blocktype='blocks', page=1, offset=10000):
@@ -122,7 +122,7 @@ class Account(Client):
         while True:
             self.build_url()
             req = self.connect()
-            print(req['message'])
+            # print(req['message'])
             if "No transactions found" in req['message']:
                 print("Total number of blocks mined: {}".format(len(blocks_list)))
                 return blocks_list
@@ -131,7 +131,7 @@ class Account(Client):
                 # Find any character block that is a integer of any length
                 page_number = re.findall(r'[1-9](?:\d{0,2})(?:,\d{3})*(?:\.\d*[1-9])?|0?\.\d*[1-9]|0',
                                          self.url_dict[self.PAGE])
-                print("page {} added".format(page_number[0]))
+                # print("page {} added".format(page_number[0]))
                 self.url_dict[self.PAGE] = str(int(page_number[0]) + 1)
 
     def get_internal_by_hash(self, tx_hash=''):
