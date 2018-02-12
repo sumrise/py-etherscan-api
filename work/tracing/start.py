@@ -50,18 +50,23 @@ def find_all_transactions(address, start_block):
 
 
 # 追踪地址 开始hash,地址，开始区块
-def find_tracing(fatherNode, record, dept=0, level=1):
+def find_tracing(fatherNode, record, dept=0, level=0):
     logging.info('----------深度' + str(dept) + '----------')
     logging.info(fatherNode.as_json())
     if fatherNode.address in address_map:
         fatherNode.name = address_map[fatherNode.address]
+        return
     else:
-        childNode = newNode(fatherNode, record, record)
-
-        next_transactions = find_all_transactions(record.to, record.blockNumber)
+        childNode = newNode(fatherNode, record, level)
+        next_transactions = find_all_transactions(childNode.address, record.blockNumber)
+        if (type(next_transactions) is str):
+            childNode.name = next_transactions
+            return
         results222 = [ob.as_json() for ob in next_transactions]
         results222 = json.dumps(results222)
         logging.info('转账记录：' + results222)
+        if len(next_transactions) <= 0:
+            pass
         logging.info('----start----' + next_transactions[0].hash)
 
         isfind = False
@@ -69,28 +74,26 @@ def find_tracing(fatherNode, record, dept=0, level=1):
         hashList = [a.hash for a in next_transactions]
         x = record.hash in hashList
         for to_node in next_transactions:  # 跳过
-            if to_node.hash == record.hash:
-                isfind = True
-            if isfind:
-                if to_node.account == record.to:  # 发出
-                    if to_node.value == record.value:
-                        childNode = newNode(fatherNode, record, to_node)
-                        find_tracing(childNode, to_node, dept + 1, level + 1)
-                    if to_node.value - record.value > 0.01:
-                        # 记录该节点
-                        childNode = newNode(fatherNode, record, to_node, level)
-                        find_tracing(childNode, to_node, dept + 1, level + 1)
+            # if to_node.hash == record.hash:
+            #     isfind = True
+            if to_node.account == childNode.address:  # 发出
+                logging.info(str(to_node.value) + "---" + str(childNode.value))
+                if to_node.value == childNode.value:
+                    find_tracing(childNode, to_node, dept + 1, 0)
+                if to_node.value - childNode.value > 0.01:
+                    find_tracing(childNode, to_node, dept + 1, level + 1)
 
     logging.info('----------end  ----------')
 
 
-def newNode(fatherNode, record, to_node, level=0):
-    childNode = Node(hash=record.hash, address=to_node.account, blockNumber=to_node.blockNumber,
-                     timeStamp=to_node.timeStamp,
+def newNode(fatherNode, record, level=0):
+    childNode = Node(hash=record.hash, address=record.to, blockNumber=record.blockNumber,
+                     timeStamp=record.timeStamp,
                      value=record.value, level=level, name='')
     fatherNode.children.append(childNode)
 
     return childNode
+
 
 def search_hash(address, hash):
     records = Record.select().where(Record.hash == hash)
@@ -118,7 +121,7 @@ if __name__ == '__main__':
     tx_hash = '0xbc2b5ec6863fe320a8f72e25ec6ab277ed9d08e25913e6fa0c53866d30dd8d11'
 
     # 两种模式 一种清库，一种不清
-    clear_db = False
+    clear_db = True
     if clear_db:
         Record.delete().where(Record.id > 0).execute()
 
