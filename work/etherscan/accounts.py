@@ -25,6 +25,15 @@ class Account(Client):
         req = self.connect()
         return req['result']
 
+    def get_balance_token(self, contract_address):
+        self.url_dict[self.ACTION] = 'tokenbalance'
+        self.url_dict[self.TAG] = 'latest'
+        self.url_dict[self.CONTRACT_ADDRESS] = contract_address
+        self.build_url()
+        req = self.connect()
+
+        return req['result']
+
     def get_transaction_page(self, page=1, offset=10000, sort='asc', internal=False):
         """
         Get a page of transactions, each transaction returns list of dict with keys:

@@ -69,7 +69,7 @@ class Node:
 
     def as_json(self):
         return dict(
-            hash=self.hash, address=self.address, name=self.name, value=self.value, level=self.level,
+            hash=self.hash, address=self.address, name=self.name, value=self.value, blockNumber=self.blockNumber, level=self.level,
             children=[ob.as_json() for ob in self.children])
 
 

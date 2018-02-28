@@ -34,63 +34,85 @@ def find_all_transactions(address, start_block, hash=''):
     if address in address_map:
         name = address_map[address]
         return name
-    records = Record.select().where(Record.account == address)
-    if len(records) <= 0:
-        api = Account(address=address, api_key=key)
-        transactions = api.get_all_transactions(start_block=start_block)
-        hash_flag = True
-        for trans in transactions:
-            count = Record.select().where(Record.hash == trans['hash']).count()
-            if hash_flag and hash != '':
-                if hash != trans['hash']:
-                    continue
-                hash_flag = False
 
-            if count <= 0:
-                Record.insert(blockNumber=int(trans['blockNumber']),
-                              timeStamp=int(trans['timeStamp']),
-                              hash=trans['hash'], account=trans['from'], to=trans['to'],
-                              value=int(trans['value']) / 10 ** 18).execute()
-        records = Record.select().where(Record.account == address)
+    api = Account(address=address, api_key=key)
+    transactions = api.get_all_transactions(sort='desc', start_block=start_block)
+    if len(transactions) > 2000:
+        address_map[address] = str(len(transactions)) + '某交易所'
+        logging.info('xxxxxxxxxxxxxxxxx----------' + address + '---------xxxxxxxxxxxxx')
+    for trans in transactions:
+        count = Record.select().where(Record.hash == trans['hash']).count()
+        if count <= 0:
+            Record.insert(blockNumber=int(trans['blockNumber']),
+                          timeStamp=int(trans['timeStamp']),
+                          hash=trans['hash'], account=trans['from'], to=trans['to'],
+                          value=int(trans['value']) / 10 ** 18).execute()
+
+        if hash == trans['hash']:
+            break
+    records = Record.select().where(Record.account == address).order_by(Record.blockNumber)
+
     return records
 
 
 # 追踪地址 开始hash,地址，开始区块
-def find_tracing(fatherNode, record, dept=0, level=0):
+def find_tracing(nodeChain, record, dept=0, level=0):
+    if dept >= 8:
+        return
     logging.info('----------深度' + str(dept) + '----------')
-    logging.info(fatherNode.as_json())
-    if fatherNode.address in address_map:
-        fatherNode.name = address_map[fatherNode.address]
+    logging.info(nodeChain.as_json())
+    if nodeChain.address in address_map:
+        nodeChain.name = address_map[nodeChain.address]
         return
     else:
-        childNode = newNode(fatherNode, record, level)
-        next_transactions = find_all_transactions(childNode.address, record.blockNumber)
-        if (type(next_transactions) is str):
+        childNode = newNode(nodeChain, record, level)
+
+        next_transactions = find_all_transactions(childNode.address, childNode.blockNumber)  #
+        if type(next_transactions) is str:
             childNode.name = next_transactions
             return
         results222 = [ob.as_json() for ob in next_transactions]
         results222 = json.dumps(results222)
-        logging.info('转账记录：' + results222)
+        print(childNode.address)
+        logging.info("转账记录：" + results222)
         if len(next_transactions) <= 0:
+            logging.info("next_transactions:" + next_transactions)
             return
-            pass
         logging.info('----start----' + next_transactions[0].hash)
 
         isfind = False
-
         hashList = [a.hash for a in next_transactions]
+        blcokerList = [a.blockNumber for a in next_transactions]
+
+        # api = Account(address=childNode.address, api_key=key)
+        # balance = api.get_balance_token(contract_address='0x809826cceab68c387726af962713b64cb5cb3cca')
+        # if int(balance) > 0:
+        #     logging.info(balance)
+
+        width = 1
         x = record.hash in hashList
         for to_node in next_transactions:  # 跳过
             # if to_node.hash == record.hash:
             #     isfind = True
+            if childNode.value == 0 or to_node.value == 0 or width > 5:
+                continue
+
             if to_node.account == childNode.address:  # 发出
                 logging.info(str(to_node.value) + "---" + str(childNode.value))
                 if to_node.value == childNode.value:
+                    # into
                     find_tracing(childNode, to_node, dept + 1, 0)
-                if to_node.value - childNode.value > 0.01:
+                    width += 1
+                elif to_node.value - childNode.value > 0.1:
                     find_tracing(childNode, to_node, dept + 1, level + 1)
+                    width += 1
+                elif abs(to_node.value - childNode.value) <= 5:
+                    find_tracing(childNode, to_node, dept + 1, level + 1)
+                    width += 1
+                else:
+                    pass
 
-    logging.info('----------end  ----------')
+    logging.info('------深度' + str(dept) + ' ----end  ----------')
 
 
 def newNode(fatherNode, record, level=0):
@@ -103,20 +125,12 @@ def newNode(fatherNode, record, level=0):
 
 
 def search_hash(address, hash):
-    records = Record.select().where(Record.hash == hash)
-    if len(records) > 0:
-        logging.info(records[0])
-    else:
-        records = find_all_transactions(address, 0, hash)
-
+    records = find_all_transactions(address, 0, hash)
     record = records[0]
+
     fatherNode = Node(hash=hash, address=address, blockNumber=0, timeStamp=0,
                       value=0, name='', level=0)
 
-    # nextNode = Node(hash=record.hash, address=record.to, blockNumber=record.blockNumber, timeStamp=record.timeStamp,
-    #                 value=record.value, name='', level=0)
-    #
-    # nextNode =
     find_tracing(fatherNode, record)
 
     logging.info('result = ')
@@ -125,7 +139,7 @@ def search_hash(address, hash):
 
 if __name__ == '__main__':
     eth_address = '0x006922CF75094708c691d06818034d89aeB23ca0'
-    tx_hash = '0xbc2b5ec6863fe320a8f72e25ec6ab277ed9d08e25913e6fa0c53866d30dd8d11'
+    tx_hash = '0xfb461918314f9f5f471fa876c8c4baf4df4f875c6e1e13cce42c91b3377163c3'
 
     # 两种模式 一种清库，一种不清
     clear_db = True
@@ -133,13 +147,3 @@ if __name__ == '__main__':
         Record.delete().where(Record.id > 0).execute()
 
     search_hash(eth_address, tx_hash)
-    #
-    # transactions = api.get_all_transactions(sort='desc', internal=False, start_block=5000000)
-    #
-    # for trans in transactions:
-    #     count = Record.select().where(Record.hash == trans['hash']).count()
-    #     if count <= 0:
-    #         Record.insert(blockNumber=int(trans['blockNumber']),
-    #                       timeStamp=int(trans['timeStamp']),
-    #                       hash=trans['hash'], account=trans['from'], to=trans['to'],
-    #                       value=int(trans['value']) / 10 ** 18).execute()
