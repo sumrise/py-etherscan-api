@@ -79,8 +79,9 @@ class Client(object):
         # TODO: deal with "unknown exception" error
         try:
             req = self.http.get(self.url)
-        except requests.exceptions.ConnectionError:
+        except requests.exceptions.ConnectionError as e:
             print("Connection refused")
+            print(e)
             exit()
             
         if req.status_code == 200:

@@ -30,6 +30,7 @@ class Account(Client):
         self.url_dict[self.TAG] = 'latest'
         self.url_dict[self.CONTRACT_ADDRESS] = contract_address
         self.build_url()
+        logging.debug(self.url)
         req = self.connect()
 
         return req['result']
