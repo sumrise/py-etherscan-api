@@ -1,9 +1,9 @@
 from .client import Client
 import re
-import logging
-
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# import logging
+#
+# logging.basicConfig(level=logging.DEBUG,
+#                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 class Account(Client):
@@ -30,7 +30,7 @@ class Account(Client):
         self.url_dict[self.TAG] = 'latest'
         self.url_dict[self.CONTRACT_ADDRESS] = contract_address
         self.build_url()
-        logging.debug(self.url)
+        # logging.debug(self.url)
         req = self.connect()
 
         return req['result']
@@ -90,7 +90,7 @@ class Account(Client):
         trans_list = []
         while True:
             self.build_url()
-            logging.debug(self.url)
+            # logging.debug(self.url)
             req = self.connect()
             if "No transactions found" in req['message']:
                 print("Total number of transactions: {}".format(len(trans_list)))

@@ -9,7 +9,7 @@
 import peewee as pw
 
 myDB = pw.MySQLDatabase('eth_tracing', user='root', password='EPze1/ma;!8qq',
-                        host='127.0.0.1', port=9527)
+                        host='101.236.59.173', port=9527)
 
 
 # todo:modify host

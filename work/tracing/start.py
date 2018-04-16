@@ -57,7 +57,7 @@ def find_all_transactions(address, start_block, hash=''):
 
 # 追踪地址 开始hash,地址，开始区块
 def find_tracing(nodeChain, record, dept=0, level=0):
-    if dept >= 7:
+    if dept >= 3:
         return
     logging.info('----------深度' + str(dept) + '----------')
     logging.info(nodeChain.as_json())
@@ -138,8 +138,8 @@ def search_hash(address, hash):
 
 
 if __name__ == '__main__':
-    eth_address = '0x3Db60CC91B33B5650eb39c026706c1A589863a1D'
-    tx_hash = '0x6cb4e1a82574ecd24f83cc560e9a655d1730515b126b3810234eb6650d89ea9d'
+    eth_address = '0xa5836a97da9f714238d4481d6bccb87789d84fdc'
+    tx_hash = '0xe114db3ec35b0961880fe460cb80675a6835ced690a930547833329d931f11ec'
 
     # 两种模式 一种清库，一种不清
     clear_db = True
