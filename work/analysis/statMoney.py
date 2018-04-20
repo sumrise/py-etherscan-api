@@ -42,7 +42,7 @@ contract_dict = {
     'mytoken': '0x9b4e2b4b13d125238aa0480dd42b4f6fc71b37cc'
 }
 
-index = 1000
+index = 210
 
 for i in range(index, len(eth_list)):
     print(i)
