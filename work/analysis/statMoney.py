@@ -8,6 +8,7 @@
 import json
 import logging
 
+# import etherscan
 from etherscan.accounts import Account
 
 q = ["0xb9164cfcdf390d2ebf6d407857accc9ac7419e10", "0x7cfc7661c43842ce5f34feb23aee3c8afc3de4f5",
@@ -40,18 +41,25 @@ contract_dict = {
     'nv': '0x809826cceab68c387726af962713b64cb5cb3cca',
     'mytoken': '0x9b4e2b4b13d125238aa0480dd42b4f6fc71b37cc'
 }
-for address in eth_list:
+
+index = 1000
+
+for i in range(index, len(eth_list)):
+    print(i)
     try:
+        address = eth_list[i]
         api = Account(address=str(address), api_key=key)  #
         balance = api.get_balance_token(contract_address=contract_dict['mytoken'])
         if int(balance) > 0:
             logging.info(balance)
             s = int(balance) / 10 ** 18
             all_money += s
-            print(address + "              " + str(balance))
+            print(str(eth_list.index(address)) + "    " + address + "              " + str(s))
             # if s != 800:
             #     print(address)
+
     except Exception as e:
+        print(i)
         print(e)
 
 print(all_money)
