@@ -36,25 +36,27 @@ all_money = 0
 with open('../../api_key.json', mode='r') as key_file:
     key = json.loads(key_file.read())['key']
 
-eth_list = [i.strip() for i in open('eth_list', 'r')]
+eth_list = [i.strip() for i in open('result', 'r')]
+
+have_eth_list = [i.strip() for i in open('result', 'r')]
 contract_dict = {
     'nv': '0x809826cceab68c387726af962713b64cb5cb3cca',
     'mytoken': '0x9b4e2b4b13d125238aa0480dd42b4f6fc71b37cc'
 }
 
-index = 210
+index = 0
 
 for i in range(index, len(eth_list)):
-    print(i)
     try:
         address = eth_list[i]
         api = Account(address=str(address), api_key=key)  #
         balance = api.get_balance_token(contract_address=contract_dict['mytoken'])
         if int(balance) > 0:
+            # if address not in have_eth_list:
             logging.info(balance)
             s = int(balance) / 10 ** 18
             all_money += s
-            print(str(eth_list.index(address)) + "    " + address + "              " + str(s))
+            print(str(i),address,str(s))
             # if s != 800:
             #     print(address)
 
